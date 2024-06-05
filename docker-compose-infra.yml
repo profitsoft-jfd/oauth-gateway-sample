@@ -1,0 +1,17 @@
+version: "3"
+services:
+  mongo:
+    image: mongo:7.0.9
+    container_name: mongo
+    ports:
+      - "27017:27017"
+
+  consul:
+    image: bitnami/consul
+    ports:
+      - "8500:8500"
+    command: "consul agent -dev -ui -client=0.0.0.0"
+
+
+
+
