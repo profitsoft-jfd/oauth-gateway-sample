@@ -1,17 +1,41 @@
-version: "3"
+version: "3.9"
+
 services:
   mongo:
     image: mongo:7.0.9
-    container_name: mongo
+    container_name: "gws-mongo"
     ports:
       - "27017:27017"
 
   consul:
     image: bitnami/consul
+    container_name: "gws-consul"
     ports:
       - "8500:8500"
     command: "consul agent -dev -ui -client=0.0.0.0"
 
+  elasticsearch:
+    image: elasticsearch:8.6.1
+    container_name: "gws-elasticsearch"
+    environment:
+      - "discovery.type=single-node"
+      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+      - "xpack.security.enabled=false"
+    ports:
+      - "9200:9200"
 
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: "gws-rabbitmq"
+    environment:
+      RABBITMQ_DEFAULT_USER: "rabbit"
+      RABBITMQ_DEFAULT_PASS: "s@cr3t"
+    ports:
+      - "5672:5672"
+      - "15672:15672"
 
+networks:
+  default:
+    name: gws-net
+    driver: bridge
 

@@ -9,7 +9,7 @@
         <version>3.3.0</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>dev.profitosft.jfd.gateway-sample</groupId>
+    <groupId>dev.profitsoft.jfd.gateway-sample</groupId>
     <artifactId>service-customers</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>service-customers</name>
@@ -47,8 +47,8 @@
             <artifactId>spring-cloud-starter-consul-discovery</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.springframework.kafka</groupId>
-            <artifactId>spring-kafka</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-amqp</artifactId>
         </dependency>
 
         <dependency>
