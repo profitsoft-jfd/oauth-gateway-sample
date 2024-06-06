@@ -29,6 +29,12 @@ spring:
             - Path=/api/contracts/**
           filters:
             - RewritePath=/api/contracts/(?<remaining>.*), /api/contracts/${remaining}
+        - id: service-searcher-route
+          uri: lb://service-searcher
+          predicates:
+            - Path=/api/search/**
+          filters:
+            - RewritePath=/api/search/(?<remaining>.*), /api/${remaining}
 
 resilience4j:
   circuitbreaker:

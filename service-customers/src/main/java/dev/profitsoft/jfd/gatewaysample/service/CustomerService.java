@@ -3,6 +3,7 @@ package dev.profitsoft.jfd.gatewaysample.service;
 import dev.profitsoft.jfd.gatewaysample.data.CustomerData;
 import dev.profitsoft.jfd.gatewaysample.dto.CustomerDetailsDto;
 import dev.profitsoft.jfd.gatewaysample.dto.CustomerSaveDto;
+import dev.profitsoft.jfd.gatewaysample.exception.NotFoundException;
 import dev.profitsoft.jfd.gatewaysample.messaging.CustomerUpdatedMessage;
 import dev.profitsoft.jfd.gatewaysample.repository.CustomerRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,10 +28,21 @@ public class CustomerService {
     return saved.getId();
   }
 
-  public CustomerDetailsDto getDetails(String id) {
+  public void update(String id, CustomerSaveDto dto) {
+    CustomerData data = getOrThrow(id);
+    copyToData(dto, data);
+    CustomerData saved = customerRepository.save(data);
+    sendCustomerUpdatedMessage(saved, false);
+  }
+
+  private CustomerData getOrThrow(String id) {
     return customerRepository.findById(id)
-        .map(this::copyToDetails)
-        .orElseThrow();
+        .orElseThrow(() -> new NotFoundException("Customer with id '%s' not found".formatted(id)));
+  }
+
+  public CustomerDetailsDto getDetails(String id) {
+    CustomerData data = getOrThrow(id);
+    return copyToDetails(data);
   }
 
   private CustomerDetailsDto copyToDetails(CustomerData customerData) {

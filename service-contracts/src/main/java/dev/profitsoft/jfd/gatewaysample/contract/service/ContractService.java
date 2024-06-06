@@ -1,10 +1,12 @@
 package dev.profitsoft.jfd.gatewaysample.contract.service;
 
+import dev.profitsoft.jfd.gatewaysample.contract.client.CustomerClient;
 import dev.profitsoft.jfd.gatewaysample.contract.config.RabbitConfig;
 import dev.profitsoft.jfd.gatewaysample.contract.data.ContractData;
 import dev.profitsoft.jfd.gatewaysample.contract.dto.ContractSaveDto;
 import dev.profitsoft.jfd.gatewaysample.contract.messaging.ContractUpdatedMessage;
 import dev.profitsoft.jfd.gatewaysample.contract.repository.ContractRepository;
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -20,13 +22,23 @@ public class ContractService {
 
   private final RabbitTemplate rabbitTemplate;
 
+  private final CustomerClient customerClient;
+
   public String create(ContractSaveDto dto) {
+    validateCustomerExists(dto.getCustomerId());
     ContractData data = new ContractData();
-    // TODO validate that the customer exists
     copyToData(dto, data);
     ContractData saved = contractRepository.save(data);
     sendContractUpdatedMessage(saved, true);
     return saved.getId();
+  }
+
+  private void validateCustomerExists(String customerId) {
+    if (customerId != null) {
+      if (customerClient.getCustomer(customerId).isEmpty()) {
+        throw new IllegalArgumentException("Customer with id '%s' not found".formatted(customerId));
+      }
+    }
   }
 
   private void sendContractUpdatedMessage(ContractData saved, boolean created) {
