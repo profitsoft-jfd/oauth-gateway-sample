@@ -4,6 +4,12 @@ server:
     include-message: always
     include-binding-errors: always
 
+oauth:
+  google:
+    clientId: ""
+    clientSecret: ""
+    scope: "openid profile email"
+
 spring:
   application:
     name: gateway
@@ -17,6 +23,10 @@ spring:
         health-check-path: /health
     gateway:
       routes:
+        - id: gateway-oauth-route
+          uri: lb://gateway
+          predicates:
+            - Path=/oauth/**
         - id: service-customers-route
           uri: lb://service-customers
           predicates:
@@ -35,6 +45,12 @@ spring:
             - Path=/api/search/**
           filters:
             - RewritePath=/api/search/(?<remaining>.*), /api/${remaining}
+  r2dbc:
+    url: "r2dbc:h2:mem:///gwsdb"
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema.sql
 
 resilience4j:
   circuitbreaker:
